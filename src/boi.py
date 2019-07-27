@@ -130,6 +130,10 @@ class Context:
 
 class AST:
 
+    @staticmethod
+    def from_parse_tree(tokens: List[Any]):
+        raise Exception("Unimplemented")
+
     def __init__(self, span: Span):
         self.span = span
     
@@ -166,6 +170,7 @@ class Id(AST):
 
     def __hash__(self):
         return hash(self.id)
+
 
 class Value(Expr):
     
@@ -214,13 +219,70 @@ class Value(Expr):
     
     def __ne__(self, other):
         return self.value != other.value
+
+
+class MultiplicativeExpr(Expr):
+
+    MULTIPLICATION  = 0
+    DIVISION        = 1
+
+    def __init__(self, lhs: Expr, operator: int, rhs: Expr, span: Span):
+        super().__init__(span)
+
+        assert 0 <= operator <= 1 
+
+        self.lhs = lhs
+        self.operator = operator
+        self.rhs = rhs
+
+    def __str__(self):
+        if self.operator == 0:
+            return f"{self.lhs} * {self.rhs}"
+        else:
+            return f"{self.lhs} / {self.rhs}"
+
+    def eval(self, context: Context) -> Value:
+        lhs_value = self.lhs.eval(context)
+        rhs_value = self.rhs.eval(context)
+
+        if self.operator == MultiplicativeExpr.MULTIPLICATION:
+            new_value = lhs_value * rhs_value
+        else:
+            new_value = lhs_value / rhs_value
+
+        assert type(new_value) == float
+
+        return Value(new_value, self.span)
+
+
+class PowExpr(Expr):
+
+    def __init__(self, lhs: MultiplicativeExpr, rhs: MultiplicativeExpr, span: Span):
+        super().__init__(span)
+
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def __str__(self):
+        return f"{self.lhs} ^ {self.rhs}"
+
+    def eval(self, context: Context) -> Value:
+        lhs_value = self.lhs.eval(context)
+        rhs_value = self.rhs.eval(context)
+
+        new_value = lhs_value ** rhs_value
     
+        assert type(new_value) == float
+
+        return Value(new_value, self.span)
+
+
 class AdditiveExpr(Expr):
 
     ADDITION    = 0
     SUBTRACTION = 1
 
-    def __init__(self, lhs: Expr, operator: int, rhs: Expr, span: Span):
+    def __init__(self, lhs: PowExpr, operator: int, rhs: PowExpr, span: Span):
         super().__init__(span)
 
         assert 0 <= operator <= 1 
@@ -239,11 +301,15 @@ class AdditiveExpr(Expr):
         lhs_value = self.lhs.eval(context)
         rhs_value = self.rhs.eval(context)
 
-        new_value = lhs_value + rhs_value
-        
+        if self.op == AdditiveExpr.ADDITION:
+            new_value = lhs_value + rhs_value
+        else:
+            new_value = lhs_value - rhs_value
+
         assert type(new_value) == float
 
         return Value(new_value, self.span)
+
 
 class ConditionExpr(Expr):
 
@@ -306,16 +372,6 @@ class ComparisonExpr(Expr):
 
 class LambdaExpr(Expr):
 
-    """
-    GRAMMAR:
-    
-    let ~ <name: id> ~ ( <unit> | <args: id+>) ~ = ~ <value: expr> ~ in ~ <body: expr>
-
-    DESC:
-    The grammar for this is the same as a normal function, but Functions are found on the
-    global scope, lambdas are nested within expressions.
-    """
-
     def __init__(self, name: Id, args: List[Id], value: Expr, body: Expr, span: Span):
         super().__init__(span)
 
@@ -342,13 +398,6 @@ class LambdaExpr(Expr):
 
 class LetExpr(Expr):
 
-    """
-    GRAMMAR:
-
-    let ~ <name: id> ~ = ~ <value: expr> ~ in ~ <body: expr>
-
-    """
-
     def __init__(self, name: Id, value: Expr, body: Expr, span: Span):
         super().__init__(span)
 
@@ -370,13 +419,6 @@ class LetExpr(Expr):
 
 
 class FunctionCall(Expr):
-    
-    """
-    GRAMMAR:
-
-    <name: id> ~ ( <unit> | <args: expr+> )
-
-    """
 
     def __init__(self, name: Id, argv: List[Expr], span: Span):
         super().__init__(span)
@@ -394,16 +436,6 @@ class FunctionCall(Expr):
 
 class IfExpr(Expr):
 
-    """
-    GRAMMAR:
-
-    if ~ ( <lhs: expr> ~ <operator: cmp_op> ~ <rhs: expr> | <condition: expr> ) ~ then ~
-        <true_expr: expr> ~
-    else ~
-        <false_expr: expr>
-
-    """
-
     def __init__(self, condition: ConditionExpr, true_expr: Expr, false_expr: Expr, span: Span):
         super().__init__(span)
 
@@ -419,13 +451,6 @@ class IfExpr(Expr):
 
 
 class Function(AST):
-
-    """
-    GRAMMAR:
-
-    let ~ <name: id> ~ ( <unit> | <args: id+> ) ~ = ~ <value: expr>
-
-    """
 
     def __init__(self, name: Id, args: List[Id], value: Expr, span: Span, is_lambda: bool = False):
         super().__init__(span)
