@@ -2,7 +2,7 @@ import random
 
 def _read_fortunes(fortune_file):
     """ Yield fortunes as lists of lines """
-    with codecs.open(fortune_file, mode='r', encoding='utf-8') as f:
+    with open(fortune_file, mode='r', encoding='utf-8') as f:
         contents = f.read()
 
     lines = [line.rstrip() for line in contents.split('\n')]
