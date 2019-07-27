@@ -176,10 +176,10 @@ class BoiParser(Parser):
                 self._let_expr_()
                 self.name_last_node('@')
             with self._option():
-                self._function_call_expr_()
+                self._if_expr_()
                 self.name_last_node('@')
             with self._option():
-                self._if_expr_()
+                self._function_call_expr_()
                 self.name_last_node('@')
             with self._option():
                 self._additive_expr_()
@@ -338,3 +338,4 @@ class BoiParser(Parser):
     @tatsumasu()
     def _start_(self):  # noqa
         self._program_()
+
