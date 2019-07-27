@@ -11,22 +11,22 @@ expr =      @:value
 
 multiplicative_expr = @+:expr { @+:( ("*" | "/") ~ expr ) }* ;
 
-pow_expr = @+:multiplicative_expr { @+:( ("*" | "/") ~ multiplicative_expr ) }* ;
+pow_expr = @+:multiplicative_expr { ( "**" ~ @+:multiplicative_expr ) }* ;
 
 additive_expr = @+:pow_expr { @+:( ("+" | "-") ~ pow_expr ) }* ;
 
 base_expr =     @:lambda_expr
             |   @:let_expr
-            |   @:function_call_expr
             |   @:if_expr 
+            |   @:function_call_expr
             |   @:additive_expr ;
 
 bool_expr =     @:comparison_expr
             |   @:condition_expr ;
-comparison_expr = base_expr (">" | ">=" | "<" | "<=" | "=" | "!=") ~ base_expr ;
+comparison_expr = base_expr (">" | ">=" | "<" | "<=" | "=" | "<>") ~ base_expr ;
 condition_expr = base_expr ;
 
-function_call_expr = id ( "(" ")" | {base_expr}+ ) ;
+function_call_expr = @+:id @+:( "(" ")" | {expr}+ ) ;
 
 let_expr = "let" @+:id "=" ~ @+:base_expr ~ "in" ~ @+:base_expr ;
 
