@@ -270,9 +270,9 @@ class MultiplicativeExpr(Expr):
         rhs_value = self.rhs.eval(context)
 
         if self.operator == MultiplicativeExpr.MULTIPLICATION:
-            new_value = lhs_value * rhs_value
+            new_value = lhs_value.value * rhs_value.value
         else:
-            new_value = lhs_value / rhs_value
+            new_value = lhs_value.value / rhs_value.value
 
         assert type(new_value) == float
 
