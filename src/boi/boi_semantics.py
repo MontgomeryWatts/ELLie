@@ -88,9 +88,9 @@ class BoiSemantics(object):
                 op = STR_TO_ADD_OP[chunk[0]]
                 continue
 
-            rhs = MultiplicativeExpr(chunk[1], op, rhs, Span.EMPTY)
+            rhs = AdditiveExpr(chunk[1], op, rhs, Span.EMPTY)
 
-        return MultiplicativeExpr(ast[0], op, rhs, Span.EMPTY)
+        return AdditiveExpr(ast[0], op, rhs, Span.EMPTY)
 
     def base_expr(self, ast):
         # assert issubclass(ast, Expr)
