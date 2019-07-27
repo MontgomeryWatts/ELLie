@@ -22,9 +22,5 @@ if __name__ == '__main__':
     from tatsu.util import asjson
 
     ast = generic_main(main, BoiParser, name='Boi')
-    print('AST:')
-    print(repr(ast))
-    print("\nPretty Printed:")
-    print(str(ast))
 
     ast.run()
