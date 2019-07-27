@@ -1,5 +1,7 @@
 from typing import Any, List, Tuple, Optional, Union, Callable
-from boi_utils import list_to_str
+import sys
+
+from boi.utils import list_to_str
 
 class Span:
 
@@ -45,6 +47,8 @@ class Context:
         self.stack_frames = [{}]
         for intrinsic in Context.INTRINSICS:
             self.push_function(intrinsic)
+        
+        self.stdout = sys.stdout
 
     def push_stack_frame(self):
         new_dict = dict()
@@ -554,7 +558,7 @@ class Function(AST):
 class IntrinsicFunction(AST):
 
     INTRINSIC_FUNCTIONS = [
-        (Id("print", Span.EMPTY), [Id("x", Span.EMPTY)], lambda x: print(x.value))
+        (Id("print", Span.EMPTY), [Id("x", Span.EMPTY)], lambda context, x: print(x.value, file=context.stdout))
     ]
 
     def __init__(self, name: Id, args: List[Id], fn: Callable):
@@ -581,7 +585,7 @@ class IntrinsicFunction(AST):
     def eval(self, context: Context):
         assert self.argv != None
         
-        r = self.fn(*self.argv)
+        r = self.fn(context, *self.argv)
 
         if r is None:
             r = 0.0
@@ -600,7 +604,8 @@ class Program:
         self.statements = statements
         self.context = Context()
 
-    def run(self):
+    def run(self, stdout=sys.stdout):
+        self.context.stdout = stdout
         for statement in self.statements:
             ty = type(statement)
 

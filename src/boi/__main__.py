@@ -2,8 +2,8 @@ import sys
 
 from tatsu.util import generic_main
 
-from boi_parser import BoiParser
-from boi_semantics import BoiSemantics
+from boi.parser import BoiParser
+from boi.semantics import BoiSemantics
 
 def main(filename, start=None, **kwargs):
     if start is None:

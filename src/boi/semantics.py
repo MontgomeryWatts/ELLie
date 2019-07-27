@@ -1,4 +1,4 @@
-from boi_ast import *
+from boi.ast import *
 
 STR_TO_MUL_OP = {"/": MultiplicativeExpr.DIVISION, "*": MultiplicativeExpr.MULTIPLICATION}
 STR_TO_ADD_OP = {"+": AdditiveExpr.ADDITION, "-": AdditiveExpr.SUBTRACTION}
