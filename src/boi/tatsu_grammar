@@ -1,0 +1,41 @@
+@@grammar::Boi
+
+id = /[a-zA-Z][a-zA-Z0-9_]*/ ;
+var = id ;
+float = /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ ;
+value = @:float ;
+
+expr =      @:value
+        |   @:var 
+        |   "(" ~ @:base_expr ~ ")" ;
+
+multiplicative_expr = @+:expr { @+:( ("*" | "/") ~ expr ) }* ;
+
+pow_expr = @+:multiplicative_expr { ( "**" ~ @+:multiplicative_expr ) }* ;
+
+additive_expr = @+:pow_expr { @+:( ("+" | "-") ~ pow_expr ) }* ;
+
+base_expr =     @:lambda_expr
+            |   @:let_expr
+            |   @:if_expr 
+            |   @:function_call_expr
+            |   @:additive_expr ;
+
+bool_expr =     @:comparison_expr
+            |   @:condition_expr ;
+comparison_expr = base_expr (">=" | ">" | "<=" | "<" | "=" | "<>") ~ base_expr ;
+condition_expr = base_expr ;
+
+function_call_expr = @+:id @+:( "(" ")" | {expr}+ ) ;
+
+let_expr = "let" @+:id "=" ~ @+:base_expr ~ "in" ~ @+:base_expr ;
+
+lambda_expr = "let" @+:id @+:( "(" ")" | {id}+ ) "=" ~ @+:base_expr ~ "in" ~ @+:base_expr ;
+
+if_expr = "if" ~ @+:bool_expr ~ "then" ~ @+:base_expr ~ "else" ~ @+:base_expr ;
+
+function = "let" @+:id @+:( "(" ")" | {id}+ ) ~ "=" ~ @+:base_expr ;
+
+program = @:{ function | base_expr }* $ ;
+
+start = program ;

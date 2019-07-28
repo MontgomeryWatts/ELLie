@@ -1,0 +1,3 @@
+let f x =
+    let cube p = p * p * p in
+        (cube x) + (cube x)
