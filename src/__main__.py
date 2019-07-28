@@ -10,15 +10,15 @@ class ELLie(discord.Client):
 	FORTUNE_TELLER = fortune.FortuneTeller('res/fortunes')
 
 	@staticmethod
-	def handle_command(command):
+	async def handle_command(command):
 		tokens = command.split(' ')
 
 		if tokens[0] == 'fortune':
 			fortune = ELLie.FORTUNE_TELLER.tell()
 			return f"'\n`{fortune}`"
-		elif command.startswith('```'):
-			command.replace('`', '')
-			return boi.run(command.replace('`', ''))
+		elif command.startswith('```') and command.endswith('```'):
+			res = await boi.run(command.replace('`', ''))
+			return res
 		else:
 			return "No such command."
 
@@ -27,7 +27,7 @@ class ELLie(discord.Client):
 			for ch in ["📠", "🇫", "🇷", "🇴", "🇬", "🇳", "🇨"]:
 				await message.add_reaction(ch)
 		elif message.content.startswith('%'):
-			res = ELLie.handle_command(message.content[1:].lstrip().rstrip())
+			res = await ELLie.handle_command(message.content[1:].lstrip().rstrip())
 			await message.channel.send(res)
 
 ellie = ELLie()
