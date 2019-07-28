@@ -203,13 +203,13 @@ class BoiParser(Parser):
         with self._group():
             with self._choice():
                 with self._option():
-                    self._token('>')
-                with self._option():
                     self._token('>=')
                 with self._option():
-                    self._token('<')
+                    self._token('>')
                 with self._option():
                     self._token('<=')
+                with self._option():
+                    self._token('<')
                 with self._option():
                     self._token('=')
                 with self._option():
@@ -339,3 +339,86 @@ class BoiParser(Parser):
     def _start_(self):  # noqa
         self._program_()
 
+
+class BoiSemantics(object):
+    def id(self, ast):  # noqa
+        return ast
+
+    def var(self, ast):  # noqa
+        return ast
+
+    def float(self, ast):  # noqa
+        return ast
+
+    def value(self, ast):  # noqa
+        return ast
+
+    def expr(self, ast):  # noqa
+        return ast
+
+    def multiplicative_expr(self, ast):  # noqa
+        return ast
+
+    def pow_expr(self, ast):  # noqa
+        return ast
+
+    def additive_expr(self, ast):  # noqa
+        return ast
+
+    def base_expr(self, ast):  # noqa
+        return ast
+
+    def bool_expr(self, ast):  # noqa
+        return ast
+
+    def comparison_expr(self, ast):  # noqa
+        return ast
+
+    def condition_expr(self, ast):  # noqa
+        return ast
+
+    def function_call_expr(self, ast):  # noqa
+        return ast
+
+    def let_expr(self, ast):  # noqa
+        return ast
+
+    def lambda_expr(self, ast):  # noqa
+        return ast
+
+    def if_expr(self, ast):  # noqa
+        return ast
+
+    def function(self, ast):  # noqa
+        return ast
+
+    def program(self, ast):  # noqa
+        return ast
+
+    def start(self, ast):  # noqa
+        return ast
+
+
+def main(filename, start=None, **kwargs):
+    if start is None:
+        start = 'id'
+    if not filename or filename == '-':
+        text = sys.stdin.read()
+    else:
+        with open(filename) as f:
+            text = f.read()
+    parser = BoiParser()
+    return parser.parse(text, rule_name=start, filename=filename, **kwargs)
+
+
+if __name__ == '__main__':
+    import json
+    from tatsu.util import asjson
+
+    ast = generic_main(main, BoiParser, name='Boi')
+    print('AST:')
+    print(ast)
+    print()
+    print('JSON:')
+    print(json.dumps(asjson(ast), indent=2))
+    print()

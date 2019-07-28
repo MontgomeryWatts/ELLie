@@ -25,8 +25,18 @@ def try_run_src(src):
     except Exception as e:
         return f"{sout.getvalue()}\nEncountered the following error while running:\n{str(e)}"
 
+def run(src):
+    start = 'start'
+    parser = BoiParser()
 
-async def run(src, **kwargs):
+    parsed = parser.parse(src, rule_name=start, filename="", semantics=BoiSemantics(), colorize=True)
+    sout = StringIO()
+    parsed.run(stdout=sout)
+
+    return sout.getvalue()
+
+
+async def async_run(src):
     global __EXECUTOR
         
     if __EXECUTOR is None:

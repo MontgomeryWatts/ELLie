@@ -17,7 +17,7 @@ class ELLie(discord.Client):
 			fortune = ELLie.FORTUNE_TELLER.tell()
 			return f"'\n`{fortune}`"
 		elif command.startswith('```') and command.endswith('```'):
-			res = await boi.run(command.replace('`', ''))
+			res = await boi.run_async(command.replace('`', ''))
 			return res
 		else:
 			return "No such command."

@@ -23,7 +23,7 @@ base_expr =     @:lambda_expr
 
 bool_expr =     @:comparison_expr
             |   @:condition_expr ;
-comparison_expr = base_expr (">" | ">=" | "<" | "<=" | "=" | "<>") ~ base_expr ;
+comparison_expr = base_expr (">=" | ">" | "<=" | "<" | "=" | "<>") ~ base_expr ;
 condition_expr = base_expr ;
 
 function_call_expr = @+:id @+:( "(" ")" | {expr}+ ) ;
